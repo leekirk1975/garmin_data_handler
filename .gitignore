@@ -13,4 +13,4 @@ lib/
 
 #specific files
 pyvenv.cfg
-
+/GamrinDetails.txt

@@ -1,10 +1,8 @@
 
 
 import os
-import garminexport
+
 from fitparse import FitFile
-
-
 
 
 cwd = os.getcwd()  # get the current working directory
@@ -16,20 +14,25 @@ fitfile = FitFile(file)
 
 
 
-
-
-
-# Get all data messages that are of type record
-for record in fitfile.get_messages('record'):
+for record in fitfile.messages:
 
     # Go through all the data entries in this record
-    for record_data in record:
+    #for record_data in record:
 
-        # Print the records name and value (and units if it has any)
-        if record_data.units:
-            print(" * %s: %s %s" % (
-                record_data.name, record_data.value, record_data.units,
-            ))
-        else:
-            print(" * %s: %s" % (record_data.name, record_data.value))
-    print()
+        print(record.name)
+
+
+# # Get all data messages that are of type record
+# for record in fitfile.get_messages('record'):
+#
+#     # Go through all the data entries in this record
+#     for record_data in record:
+#
+#         # Print the records name and value (and units if it has any)
+#         if record_data.units:
+#             print(" * %s: %s %s" % (
+#                 record_data.name, record_data.value, record_data.units,
+#             ))
+#         else:
+#             print(" * %s: %s" % (record_data.name, record_data.value))
+#     print()
