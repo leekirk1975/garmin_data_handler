@@ -7,8 +7,11 @@ from fitparse import FitFile
 
 cwd = os.getcwd()  # get the current working directory
 # Save all data files to a sub directory to aviod cultering
-file = cwd + '/data/5623904498.fit'
+# 5670672729
+#file = cwd + '/data/5623904498.fit'
 #file = cwd + '/data/2020-10-03/69156120772.fit'
+file = cwd + '/data/5670672729.fit'
+
 print (file)
 fitfile = FitFile(file)
 
