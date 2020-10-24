@@ -26,7 +26,7 @@ def create_dataframe(thedata, thedict = None):
             if thedict is None:
                 dictdf[dfthedata.name] = dfthedata
             elif dfthedata.name  in thedict.keys():
-
+                #append new data to the dataframe in the dict
                 print(dfthedata.name)
                 print(dfthedata)
             else:
