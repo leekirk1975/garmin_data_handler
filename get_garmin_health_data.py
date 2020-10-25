@@ -15,18 +15,21 @@ client = gc(email,pwd)
 gc.login(client)
 
 
-def create_dataframe(thedata, thedict = None):
+def create_dataframe(thedata, thedict ={}):
 
-    dictdf = {}
 
     for i in thedata:
         if isinstance(thedata[i], (dict,list)):#skip any field from the json file that is not data in a list or dictionary
             dfthedata = convert_json_to_df(thedata[i]) #convert the jason field to a DF
             dfthedata.name = i
-            if thedict is None:
-                dictdf[dfthedata.name] = dfthedata
-            elif dfthedata.name  in thedict.keys():
-                #append new data to the dataframe in the dict
+            if dfthedata.name not in thedict.keys():
+                #if this if the firt data set create a new df name after the data set and add it to a dictonary
+                thedict[dfthedata.name] = dfthedata
+            elif dfthedata.name in thedict.keys():
+                #append additional data to the existing dataframe in the dict
+                print(thedict[dfthedata.name])
+                thedict[dfthedata.name].append(dfthedata)
+
                 print(dfthedata.name)
                 print(dfthedata)
             else:
@@ -34,7 +37,7 @@ def create_dataframe(thedata, thedict = None):
 
 
 
-    return(dictdf)
+    return(thedict)
 
 
 def convert_json_to_df(thedatafield):
@@ -56,7 +59,7 @@ def convert_json_to_df(thedatafield):
     
 dictsleep={}
 #iterate through the historical data series
-for i in range(2,4):
+for i in range(2,6):
 
     iterdate = today - datetime.timedelta(days=i)
     
@@ -65,6 +68,7 @@ for i in range(2,4):
     if not bool(dictsleep):
         dictsleep = create_dataframe(sleepdata)
     elif bool(dictsleep): #if the dict is not empty then pass and append need data to the existing dataframes
-        dictsleep = create_dataframe(sleepdata,dictsleep )
+        dictsleep = create_dataframe(sleepdata,dictsleep)
 
-
+print(dictsleep.keys())
+print(dictsleep)
