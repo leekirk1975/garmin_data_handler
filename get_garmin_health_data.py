@@ -65,14 +65,15 @@ def df_to_csv(data, fileName,date_stamp): #create csv file
 
 
 
-#iterate through the historical data series
+#SLEEP DATA
+#iterate through the historical garmin sleep data series, convert json data to dataframes
+# and then output a csvfile for each data frame
 dictsleep={}
-for i in range(2,6):
+for i in range(2,3):
 
     iterdate = today - datetime.timedelta(days=i)
     
     sleepdata =  gc.get_sleep_data(client,iterdate.isoformat())
-    #print(sleepdata)
     if not bool(dictsleep):
         dictsleep = create_dataframe(sleepdata)
     elif bool(dictsleep): #if the dict is not empty then pass and append need data to the existing dataframes
@@ -81,5 +82,21 @@ for i in range(2,6):
 for i  in dictsleep.keys():
       df_to_csv(dictsleep[i], i,today)
 
+# Get body comp and user stats
+# iterate through the historical garmin sleep data series, convert json data to dataframes
+# and then output a csvfile for each data frame
+dictbodystats = {}
+for i in range(2, 3):
+
+    iterdate = today - datetime.timedelta(days=i)
+
+    bodystatsdata = gc.get_stats_and_body(client, iterdate.isoformat())
+    if not bool(dictbodystats):
+        dictsleep = create_dataframe(bodystatsdata)
+    elif bool(dictbodystats):  # if the dict is not empty then pass and append need data to the existing dataframes
+        dictbodystats = create_dataframe(bodystatsdata, dictbodystats)
+
+for i in dictbodystats.keys():
+    df_to_csv(dictbodystats[i], i, today)
 
 
