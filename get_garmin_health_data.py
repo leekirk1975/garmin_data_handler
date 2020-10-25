@@ -4,19 +4,20 @@
 from garminconnect import Garmin as gc
 import datetime
 import pandas as pd
+import os
 
 email, pwd  = open('GamrinDetails.txt').read().strip().split(',')#set the client secret and refresh token
 
 #set todays date
 today = datetime.date.today()
 
-
+#create a garmin api session
 client = gc(email,pwd)
 gc.login(client)
 
 
+#convert the json files to dataframes
 def create_dataframe(thedata, thedict ={}):
-
 
     for i in thedata:
         if isinstance(thedata[i], (dict,list)):#skip any field from the json file that is not data in a list or dictionary
@@ -28,7 +29,8 @@ def create_dataframe(thedata, thedict ={}):
             elif dfthedata.name in thedict.keys():
                 #append additional data to the existing dataframe in the dict
                 print(thedict[dfthedata.name])
-                thedict[dfthedata.name].append(dfthedata)
+                print(type(thedict[dfthedata.name]))
+                thedict[dfthedata.name] = thedict[dfthedata.name].append(dfthedata)
 
                 print(dfthedata.name)
                 print(dfthedata)
@@ -53,12 +55,18 @@ def convert_json_to_df(thedatafield):
 
         return df
 
-#def df_to_csv()
-    #Write_Data_to_csv (df_activity_streams, 'Activity_streams',date_stamp)
-    #print('finished sleepdata '+' '+ str(iterdate)
-    
-dictsleep={}
+def df_to_csv(data, fileName,date_stamp): #create csv file
+   cwd = os.getcwd()#get the current working directory
+   # Save all data files to a sub directory to aviod cultering
+   csvname = cwd + '/data/'+ fileName+ '_' + str(date_stamp.strftime('%Y%m%d%H%M%S')) + '.csv'
+   data.to_csv(csvname)
+
+
+
+
+
 #iterate through the historical data series
+dictsleep={}
 for i in range(2,6):
 
     iterdate = today - datetime.timedelta(days=i)
@@ -70,5 +78,8 @@ for i in range(2,6):
     elif bool(dictsleep): #if the dict is not empty then pass and append need data to the existing dataframes
         dictsleep = create_dataframe(sleepdata,dictsleep)
 
-print(dictsleep.keys())
-print(dictsleep)
+for i  in dictsleep.keys():
+      df_to_csv(dictsleep[i], i,today)
+
+
+
