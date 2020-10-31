@@ -44,7 +44,7 @@ iterdate = today - datetime.timedelta(days=3)
 
 thedict ={}
 
-data =  gc.get_sleep_data(client,iterdate.isoformat())
+data =  gc.get_heart_rates(client,iterdate.isoformat())
 
 df1 = pd.json_normalize(data)
 for i in data:
