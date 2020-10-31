@@ -35,8 +35,9 @@ def create_dataframe(thedata, thedict ={}):
                 print(dfthedata.name)
                 print(dfthedata)
             else:
-                print('somthing wrong')
-
+                print('somthing wrong level 2 create_dataframe')
+        else:
+                print('somthing wrong level 1 create_dataframe')
 
 
     return(thedict)
@@ -62,41 +63,54 @@ def df_to_csv(data, fileName,date_stamp): #create csv file
    data.to_csv(csvname)
 
 
+def unest(data, dictdata):
+
+        if not bool(dictdata):
+            dictdata = create_dataframe(data)
+        elif bool(dictdata):  # if the dict is not empty then pass and append need data to the existing dataframes
+            dictdata = create_dataframe(data, dictdata)
+        return dictdata
 
 
 
 #SLEEP DATA
 #iterate through the historical garmin sleep data series, convert json data to dataframes
 # and then output a csvfile for each data frame
-dictsleep={}
-for i in range(2,3):
-
-    iterdate = today - datetime.timedelta(days=i)
-    
-    sleepdata =  gc.get_sleep_data(client,iterdate.isoformat())
-    if not bool(dictsleep):
-        dictsleep = create_dataframe(sleepdata)
-    elif bool(dictsleep): #if the dict is not empty then pass and append need data to the existing dataframes
-        dictsleep = create_dataframe(sleepdata,dictsleep)
-
-for i  in dictsleep.keys():
-      df_to_csv(dictsleep[i], i,today)
+#dictsleep={}
+# for i in range(2,3):
+#
+#     iterdate = today - datetime.timedelta(days=i)
+#
+#     sleepdata =  gc.get_sleep_data(client,iterdate.isoformat())
+#     if not bool(dictsleep):
+#         dictsleep = create_dataframe(sleepdata)
+#     elif bool(dictsleep): #if the dict is not empty then pass and append need data to the existing dataframes
+#         dictsleep = create_dataframe(sleepdata,dictsleep)
+#
+# for i  in dictsleep.keys():
+#       df_to_csv(dictsleep[i], i,today)
 
 # Get body comp and user stats
 # iterate through the historical garmin sleep data series, convert json data to dataframes
 # and then output a csvfile for each data frame
-dictbodystats = {}
+dictdata = {}
 for i in range(2, 3):
 
     iterdate = today - datetime.timedelta(days=i)
 
-    bodystatsdata = gc.get_stats_and_body(client, iterdate.isoformat())
-    if not bool(dictbodystats):
-        dictsleep = create_dataframe(bodystatsdata)
-    elif bool(dictbodystats):  # if the dict is not empty then pass and append need data to the existing dataframes
-        dictbodystats = create_dataframe(bodystatsdata, dictbodystats)
+    data = gc.get_sleep_data(client, iterdate.isoformat())
+    dictdata = unest(data, dictdata)
+    data = gc.get_heart_rates(client, iterdate.isoformat())
+    dictdata = unest(data, dictdata)
+    data = gc.get_steps_data(client, iterdate.isoformat())
+    df = pd.json_normalize(data)
+    #df.name = data
+    #dictdata[data.name] = dictdata[data.name].append(dfthedata)
+    #data = gc.get_stats_and_body(client, iterdate.isoformat())
 
-for i in dictbodystats.keys():
-    df_to_csv(dictbodystats[i], i, today)
+
+
+for k  in dictdata.keys():
+       df_to_csv(dictdata[k], k,today)
 
 
