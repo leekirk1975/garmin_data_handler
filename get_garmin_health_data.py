@@ -28,12 +28,7 @@ def create_sleep_dataframe(thedata, thedict ={}):
                 thedict[dfthedata.name] = dfthedata
             elif dfthedata.name in thedict.keys():
                 #append additional data to the existing dataframe in the dict
-                print(thedict[dfthedata.name])
-                print(type(thedict[dfthedata.name]))
                 thedict[dfthedata.name] = thedict[dfthedata.name].append(dfthedata)
-
-                print(dfthedata.name)
-                print(dfthedata)
             else:
                 print('somthing wrong level 2 create_dataframe')
         else:
@@ -90,7 +85,7 @@ def filterTheDict(dictObj, callback):
 
 
 dictdata = {}
-for i in range(2, 3):
+for i in range(2, 100):
 
     iterdate = today - datetime.timedelta(days=i)
 
@@ -99,25 +94,37 @@ for i in range(2, 3):
     dictdata = unest(data, dictdata)
 #convert daily HR data to one CSV
     data = gc.get_heart_rates(client, iterdate.isoformat())
+    #extract the daily heart rate summary data excluding any list create a  df
     df = pd.DataFrame(filterTheDict(data, (dict, list)),index=[0])
     df.name = 'Heart_Rate_Summary'
-    #extract the daily heart rate summary data excluding any list create a  df
     if df.name in dictdata.keys():
         dictdata[df.name] = dictdata[df.name].append(df)
     elif df.name not in dictdata.keys():
         dictdata[df.name] = df
     #extract the list with the detail rate data merger them into one data frame
+    df = pd.DataFrame(data['heartRateValues'],columns=['timestamp','heatRateValues'])
+    df.name = 'Heart_Rate_details'
+    if df.name in dictdata.keys():
+        dictdata[df.name] = dictdata[df.name].append(df)
+    elif df.name not in dictdata.keys():
+        dictdata[df.name] = df
 
 #convert daily stats and body compostion to one CSV
     data = gc.get_stats_and_body(client, iterdate.isoformat())
     df = pd.json_normalize(data)
     df.name = 'stats_body_comp'
-    dictdata[df.name] = dictdata[df.name].append(df)
+    if df.name in dictdata.keys():
+        dictdata[df.name] = dictdata[df.name].append(df)
+    elif df.name not in dictdata.keys():
+        dictdata[df.name] = df
 #convert daily step to one CSV
-    #data = gc.get_steps_data(client, iterdate.isoformat())
-    #df = pd.json_normalize(data)
-    #df.name = 'steps data'
-    #dictdata[df.name] = dictdata[df.name].append(df)
+    data = gc.get_steps_data(client, iterdate.isoformat())
+    df = pd.json_normalize(data)
+    df.name = 'daily_steps'
+    if df.name in dictdata.keys():
+        dictdata[df.name] = dictdata[df.name].append(df)
+    elif df.name not in dictdata.keys():
+        dictdata[df.name] = df
 
 
 
