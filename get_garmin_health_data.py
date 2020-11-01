@@ -6,7 +6,8 @@ import datetime
 import pandas as pd
 import os
 
-email, pwd  = open('GamrinDetails.txt').read().strip().split(',')#set the client secret and refresh token
+#get login and password
+email, pwd  = open('GamrinDetails.txt').read().strip().split(',')
 
 #set todays date
 today = datetime.date.today()
@@ -15,8 +16,9 @@ today = datetime.date.today()
 client = gc(email,pwd)
 gc.login(client)
 
-
-#convert the json files to dataframes
+'''
+convert the json files to dataframes
+'''
 def create_sleep_dataframe(thedata, thedict ={}):
 
     for i in thedata:
@@ -39,9 +41,10 @@ def create_sleep_dataframe(thedata, thedict ={}):
 
 
 
-
+'''
+convert json and list to dataframes 
+'''
 def convert_json_to_df(thedatafield):
-
         if isinstance(thedatafield ,dict):
             # index = 0 to aviod "ValueError: If using all scalar values, you must pass an index"
             df = pd.DataFrame(thedatafield, index=[0]) #https://stackoverflow.com/questions/17839973/constructing-pandas-dataframe-from-values-in-variables-gives-valueerror-if-usi
@@ -80,8 +83,9 @@ def filterTheDict(dictObj, callback):
         if not isinstance(value, list):
             newDict[key] = value
     return newDict
-
-#handle creation of the df and then after creation apprend new data
+'''
+handle creation of the df and then after creation apprend new data
+'''
 def df_create_append(df, dictdata, name):
     df.name = name
     if df.name in dictdata.keys():
@@ -91,11 +95,13 @@ def df_create_append(df, dictdata, name):
     return dictdata
 
 dictdata = {}
+#loop from today-2 until x days to collect history
+
 for i in range(2, 750):
 
     iterdate = today - datetime.timedelta(days=i)
-#Deal with Garmin Json data
-#break Json sleep data down into dataframes and export to CSV
+
+#Deal with Garmin Json data break Json sleep data down into two dataframes 1) sleep summary 2) sleep interday details and export to CSV
     data = gc.get_sleep_data(client, iterdate.isoformat())
     dictdata = unest(data, dictdata)
 #convert daily HR data to one CSV
