@@ -34,7 +34,6 @@ def create_sleep_dataframe(thedata, thedict ={}):
         else:
                 print('somthing wrong level 1 create_dataframe')
 
-
     return(thedict)
 
 
@@ -62,7 +61,6 @@ def df_to_csv(data, fileName,date_stamp): #create csv file
 
 
 def unest(data, dictdata):
-
         if not bool(dictdata):
             dictdata = create_sleep_dataframe(data)
         elif bool(dictdata):  # if the dict is not empty then pass and append need data to the existing dataframes
@@ -83,13 +81,21 @@ def filterTheDict(dictObj, callback):
             newDict[key] = value
     return newDict
 
+#handle creation of the df and then after creation apprend new data
+def df_create_append(df, dictdata, name):
+    df.name = name
+    if df.name in dictdata.keys():
+        dictdata[df.name] = dictdata[df.name].append(df)
+    elif df.name not in dictdata.keys():
+        dictdata[df.name] = df
+    return dictdata
 
 dictdata = {}
-for i in range(2, 100):
+for i in range(2, 750):
 
     iterdate = today - datetime.timedelta(days=i)
-
-#break sleep data down into dataframes and export to CSV
+#Deal with Garmin Json data
+#break Json sleep data down into dataframes and export to CSV
     data = gc.get_sleep_data(client, iterdate.isoformat())
     dictdata = unest(data, dictdata)
 #convert daily HR data to one CSV
@@ -101,33 +107,19 @@ for i in range(2, 100):
         dictdata[df.name] = dictdata[df.name].append(df)
     elif df.name not in dictdata.keys():
         dictdata[df.name] = df
-    #extract the list with the detail rate data merger them into one data frame
+#extract the list with the detail rate data merger them into one data frame
     df = pd.DataFrame(data['heartRateValues'],columns=['timestamp','heatRateValues'])
-    df.name = 'Heart_Rate_details'
-    if df.name in dictdata.keys():
-        dictdata[df.name] = dictdata[df.name].append(df)
-    elif df.name not in dictdata.keys():
-        dictdata[df.name] = df
-
+    dictdata = df_create_append(df,dictdata,'Heart_Rate_details')
 #convert daily stats and body compostion to one CSV
     data = gc.get_stats_and_body(client, iterdate.isoformat())
     df = pd.json_normalize(data)
-    df.name = 'stats_body_comp'
-    if df.name in dictdata.keys():
-        dictdata[df.name] = dictdata[df.name].append(df)
-    elif df.name not in dictdata.keys():
-        dictdata[df.name] = df
+    dictdata = df_create_append(df,dictdata,'stats_body_comp')
 #convert daily step to one CSV
     data = gc.get_steps_data(client, iterdate.isoformat())
     df = pd.json_normalize(data)
-    df.name = 'daily_steps'
-    if df.name in dictdata.keys():
-        dictdata[df.name] = dictdata[df.name].append(df)
-    elif df.name not in dictdata.keys():
-        dictdata[df.name] = df
+    dictdata = df_create_append(df,dictdata,'daily_steps')
 
-
-
+#loop through the dict of dataframes write a CSV file for each one
 for k  in dictdata.keys():
        df_to_csv(dictdata[k], k,today)
 
