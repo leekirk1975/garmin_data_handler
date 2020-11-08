@@ -94,7 +94,7 @@ def df_create_append(df, dictdata, name):
 dictdata = {}
 #loop from today-2 until x days to collect history
 
-for i in range(2, 750):
+for i in range(2, 5):
 
     iterdate = today - datetime.timedelta(days=i)
 
