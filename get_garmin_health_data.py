@@ -52,18 +52,18 @@ def convert_json_to_df(thedatafield):
             print("type not list or dict")
 
         return df
-
+#export data frame to CSV
 def df_to_csv(data, fileName,date_stamp): #create csv file
    cwd = os.getcwd()#get the current working directory
    # Save all data files to a sub directory to aviod cultering
    csvname = cwd + '/data/'+ fileName+ '_' + str(date_stamp.strftime('%Y%m%d%H%M%S')) + '.csv'
    data.to_csv(csvname)
 
-
+#handle the unesting of the sleep DF - unquie case.
 def unest(data, dictdata):
         if not bool(dictdata):
             dictdata = create_sleep_dataframe(data)
-        elif bool(dictdata):  # if the dict is not empty then pass and append need data to the existing dataframes
+        elif bool(dictdata):  # if the dict is not empty then pass and append data to the existing dataframes
             dictdata = create_sleep_dataframe(data, dictdata)
         return dictdata
 
@@ -93,8 +93,7 @@ def df_create_append(df, dictdata, name):
 
 dictdata = {}
 #loop from today-2 until x days to collect history
-
-for i in range(2, 5):
+for i in range(2, 10):
 
     iterdate = today - datetime.timedelta(days=i)
 
@@ -103,7 +102,7 @@ for i in range(2, 5):
     dictdata = unest(data, dictdata)
 #convert daily HR data to one CSV
     data = gc.get_heart_rates(client, iterdate.isoformat())
-    #extract the daily heart rate summary data excluding any list create a  df
+#extract the daily heart rate summary data excluding any list create a  df
     df = pd.DataFrame(filterTheDict(data, (dict, list)),index=[0])
     df.name = 'Heart_Rate_Summary'
     if df.name in dictdata.keys():
