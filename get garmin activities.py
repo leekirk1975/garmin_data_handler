@@ -11,6 +11,8 @@ import os
 #get login and password
 email, pwd  = open('GamrinDetails.txt').read().strip().split(',')
 
+
+#write CSV files
 def df_to_csv(data, fileName,date_stamp): #create csv file
    cwd = os.getcwd()#get the current working directory
    # Save all data files to a sub directory to aviod cultering
@@ -31,14 +33,17 @@ def df_to_csv(data, fileName,date_stamp): #create csv file
 #set todays date
 today = datetime.date.today()
 start_date = datetime.date(2020, 11, 1)
+
+
+#set the location to store files
 cwd = os.getcwd()
 backup_dir = cwd + '/data/garmin_backup'
-gcb.incremental_backup(email,pwd,backup_dir,("json_summary", "json_details", "gpx", "tcx"))
-#for some reason when this function is passed it fails "fit", the code block below adds the missing fit files
+#write all files excluding fit - for some reason when this function is passed it fails "fit", the code block below adds the missing fit files
+gcb.incremental_backup(email,pwd,backup_dir) #("json_summary", "json_details", "gpx", "tcx"))
 
 
 
-
+''' get missing FIT files and write to the the directory passed'''
 #login to garmin
 client = ge.GarminClient(email,pwd)
 ge.GarminClient.connect(client)
