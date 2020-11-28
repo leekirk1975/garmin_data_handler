@@ -1,7 +1,6 @@
 
 
 import os
-
 from fitparse import FitFile
 
 
@@ -10,7 +9,7 @@ cwd = os.getcwd()  # get the current working directory
 # 5670672729
 #file = cwd + '/data/5623904498.fit'
 #file = cwd + '/data/2020-10-03/69156120772.fit'
-file = cwd + '/data/5670672729.fit'
+file = cwd + '/data/2020-11-22T09/11/21+00/00_5856698684.fit'
 
 print (file)
 fitfile = FitFile(file)

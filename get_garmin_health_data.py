@@ -93,8 +93,8 @@ dictdata = {}
 
 #Get all garmin connect health data and exprt to CSV files
 #loop from today-2 until x days to collect history
-for i in range(2, 700):
-
+for i in range(2, 750):
+    print ( i )
     iterdate = today - datetime.timedelta(days=i)
 
 #Deal with Garmin Json data break Json sleep data down into two dataframes 1) sleep summary 2) sleep interday details and export to CSV
