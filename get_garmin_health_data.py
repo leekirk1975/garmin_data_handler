@@ -16,9 +16,8 @@ today = datetime.date.today()
 client = gc(email,pwd)
 gc.login(client)
 
-'''
-convert the json files to dataframes
-'''
+
+#Deal with the special case of sleepdata - convert json files to dataframes
 def create_sleep_dataframe(thedata, thedict ={}):
 
     for i in thedata:
@@ -26,17 +25,25 @@ def create_sleep_dataframe(thedata, thedict ={}):
             dfthedata = convert_json_to_df(thedata[i]) #convert the jason field to a DF
             dfthedata.name = i
             if dfthedata.name not in thedict.keys():
-                #if this if the firt data set create a new df name after the data set and add it to a dictonary
+                #if this is the first data set create a new df name after the data set and add it to a dictonary
                 thedict[dfthedata.name] = dfthedata
             elif dfthedata.name in thedict.keys():
-                #append additional data to the existing dataframe in the dict
+                #append any additional data to the existing dataframe in the dict
                 thedict[dfthedata.name] = thedict[dfthedata.name].append(dfthedata)
             else:
-                print('skip level 2 create_dataframe')
+                print('skip 2 create_dataframe')
         else:
-                print('skip level 1 create_dataframe')
+                print('skip 1 create_dataframe')
 
     return(thedict)
+
+#handle the unesting of the sleep DF - unquie case.
+def unest(data, dictdata):
+        if not bool(dictdata):
+            dictdata = create_sleep_dataframe(data)
+        elif bool(dictdata):  # if the dict is not empty then pass and append data to the existing dataframes
+            dictdata = create_sleep_dataframe(data, dictdata)
+        return dictdata
 
 
 #convert json and list to dataframes
@@ -52,20 +59,12 @@ def convert_json_to_df(thedatafield):
 
         return df
 
-#write from data frame to CSV
+#write from a dataframe to CSV
 def df_to_csv(data, fileName,date_stamp): #create csv file
    cwd = os.getcwd()#get the current working directory
    # Save all data files to a sub directory to aviod cultering
    csvname = cwd + '/data/'+ fileName + '.csv' # + '_' + str(date_stamp.strftime('%Y%m%d%H%M%S')) + '.csv'
    data.to_csv(csvname)
-
-#handle the unesting of the sleep DF - unquie case.
-def unest(data, dictdata):
-        if not bool(dictdata):
-            dictdata = create_sleep_dataframe(data)
-        elif bool(dictdata):  # if the dict is not empty then pass and append data to the existing dataframes
-            dictdata = create_sleep_dataframe(data, dictdata)
-        return dictdata
 
 '''
 Iterate over all the key value pairs in dictionary and call the given
@@ -81,7 +80,7 @@ def filterTheDict(dictObj, callback):
             newDict[key] = value
     return newDict
 '''
-handle creation of the df if it does not exist and thereafter  append new data
+Create a new df if it does not exist and thereafter append any new data
 '''
 def df_create_append(df, dictdata, name):
     df.name = name
@@ -91,18 +90,18 @@ def df_create_append(df, dictdata, name):
         dictdata[df.name] = df
     return dictdata
 
+#convert a string to date format
 def convert_date(format_str,date_str):
     return datetime.datetime.strptime(date_str, format_str).date()
 
 
 
 # Get data from garmin
-
 #set-up empty dict top store all the DF
 dictdata = {}
 
-#1) check if the CSV file exists, if not load all the data. If the file exists then
-#1) open CSV file, 2) load the CSV file in a panadas data frame 3) append anynew data 4) save the updated csv file
+#1) check if the CSV file exists, if not load all the data.
+# If the file exists then 1) open CSV file, 2) load the CSV file in a panadas data frame 3) append anynew data 4) save the updated csv file
 
 #list of the CSV files to dump the garmin query data
 lstfiles = ['stats_body_comp','daily_steps','Heart_Rate_details','Heart_Rate_Summary','sleepStress','wellnessEpochRespirationDataDTOList'
@@ -111,31 +110,28 @@ lstfiles = ['stats_body_comp','daily_steps','Heart_Rate_details','Heart_Rate_Sum
 for filename in lstfiles:
     cwd = os.getcwd()  # get the current working directory
     csv_file_name = cwd + '/data/'+ filename +".csv"
-    file_exists =  os.path.isfile(filename)
+    file_exists =  os.path.isfile(csv_file_name)
 
     if file_exists:#check to see if the files already exist, if they do then check the last data
         df_his_data= pd.read_csv(csv_file_name)
         #Get the start date once
-        if csv_file_name == 'stats_body_comp':
+        if filename == 'stats_body_comp':
             date_str = df_his_data['calendarDate'].iloc[0]
             last_date = convert_date('%Y-%m-%d', date_str)
             end_date = datetime.datetime.now().date() - datetime.timedelta(days=2)
-            start = 2
-            end = start + abs((last_date - end_date).days)
-            print("The last date in the file is " + last_date + " #records to add " + end)
-        # df_his_data.name = i
-        # if df_his_data.name in dictdata.keys():
-        #     dictdata[df_his_data.name] = dictdata[df_his_data.name].append(df_his_data)
-        # elif df_his_data.name not in dictdata.keys():
-        #     dictdata[df_his_data.name] = df_his_data
-        print("file exists, now loading daat from " + csv_file_name)
-        dictdata = df_create_append(df_his_data, dictdata, i)
+            start = 1
+            end = start + abs((last_date - end_date).days) #fdetermine number of days of data to collect
+            print("The last date in the file is " + last_date.strftime("%m/%d/%Y") + " #records to add " + str(end))
 
-    else:
-            start = 2
+        print("file exists, now loading data from " + csv_file_name)
+        #append df to dict
+        dictdata = df_create_append(df_his_data, dictdata, filename)
+
+    else:#get the histroy between the start end day range
+            start = 1
             end = 800
-#Get all garmin connect health data and exprt to CSV files
-#loop from today-2 until x days to collect history
+
+#Get all garmin connect health data and export to CSV files
 for i in range(start, end):
     print ( i )
     iterdate = today - datetime.timedelta(days=i)
