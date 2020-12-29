@@ -3,7 +3,7 @@ from garminconnect import Garmin as gc
 import datetime
 import pandas as pd
 import os
-import csv
+#import csv
 
 
 #get login and password
@@ -63,7 +63,7 @@ def convert_json_to_df(thedatafield):
 def df_to_csv(data, fileName,date_stamp): #create csv file
    cwd = os.getcwd()#get the current working directory
    # Save all data files to a sub directory to aviod cultering
-   csvname = cwd + '/data/'+ fileName + '.csv' # + '_' + str(date_stamp.strftime('%Y%m%d%H%M%S')) + '.csv'
+   csvname = cwd + '/data/'+ fileName + ' raw data.csv' # + '_' + str(date_stamp.strftime('%Y%m%d%H%M%S')) + '.csv'
    data.to_csv(csvname, index=False)
 
 
@@ -97,6 +97,8 @@ def convert_date(format_str,date_str):
 # Get data from garmin
 #set-up empty dict top store all the DF
 dictdata = {}
+start = 0
+end = 0
 
 #1) check if the CSV file exists, if not load all the data.
 # If the file exists then 1) open CSV file, 2) load the CSV file in a panadas data frame 3) append anynew data 4) save the updated csv file
@@ -105,9 +107,11 @@ dictdata = {}
 lstfiles = ['stats_body_comp','daily_steps','Heart_Rate_details','Heart_Rate_Summary','sleepStress','wellnessEpochRespirationDataDTOList'
             ,'wellnessEpochSPO2DataDTOList','wellnessSpO2SleepSummaryDTO','sleepLevels','sleepMovement','dailySleepDTO','activities summaries']
 
+
+
 for filename in lstfiles:
     cwd = os.getcwd()  # get the current working directory
-    csv_file_name = cwd + '/data/'+ filename +".csv"
+    csv_file_name = cwd + '/data/'+ filename +" raw data.csv"
     file_exists =  os.path.isfile(csv_file_name)
 
     if file_exists:#check to see if the files already exist, if they do then check the last data
