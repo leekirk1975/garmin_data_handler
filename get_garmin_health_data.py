@@ -31,9 +31,9 @@ def create_sleep_dataframe(thedata, thedict ={}):
                 #append any additional data to the existing dataframe in the dict
                 thedict[dfthedata.name] = thedict[dfthedata.name].append(dfthedata)
             else:
-                print('skip 2 create_dataframe')
+               pass
         else:
-                print('skip 1 create_dataframe')
+               pass
 
     return(thedict)
 
@@ -64,13 +64,12 @@ def df_to_csv(data, fileName,date_stamp): #create csv file
    cwd = os.getcwd()#get the current working directory
    # Save all data files to a sub directory to aviod cultering
    csvname = cwd + '/data/'+ fileName + '.csv' # + '_' + str(date_stamp.strftime('%Y%m%d%H%M%S')) + '.csv'
-   data.to_csv(csvname)
+   data.to_csv(csvname, index=False)
 
-'''
-Iterate over all the key value pairs in dictionary and call the given
-callback function() on each pair. Items for which callback() returns True,
-add them to the new dictionary. In the end return the new dictionary.
-'''
+
+#Iterate over all the key value pairs in dictionary and call the given callback function()
+# on each pair. Items for which callback() returns True, add them to the new dictionary.
+# In the end return the new dictionary.
 def filterTheDict(dictObj, callback):
     newDict = dict()
     # Iterate over all the items in dictionary
@@ -79,9 +78,8 @@ def filterTheDict(dictObj, callback):
         if not isinstance(value, list):
             newDict[key] = value
     return newDict
-'''
-Create a new df if it does not exist and thereafter append any new data
-'''
+
+#Create a new df if it does not exist and thereafter append any new data
 def df_create_append(df, dictdata, name):
     df.name = name
     if df.name in dictdata.keys():
@@ -105,7 +103,7 @@ dictdata = {}
 
 #list of the CSV files to dump the garmin query data
 lstfiles = ['stats_body_comp','daily_steps','Heart_Rate_details','Heart_Rate_Summary','sleepStress','wellnessEpochRespirationDataDTOList'
-            ,'wellnessEpochSPO2DataDTOList','wellnessSpO2SleepSummaryDTO','sleepLevels','sleepMovement','dailySleepDTO']
+            ,'wellnessEpochSPO2DataDTOList','wellnessSpO2SleepSummaryDTO','sleepLevels','sleepMovement','dailySleepDTO','activities summaries']
 
 for filename in lstfiles:
     cwd = os.getcwd()  # get the current working directory
@@ -116,10 +114,10 @@ for filename in lstfiles:
         df_his_data= pd.read_csv(csv_file_name)
         #Get the start date once
         if filename == 'stats_body_comp':
-            date_str = df_his_data['calendarDate'].iloc[0]
+            date_str = df_his_data['calendarDate'].iloc[-1] #get the last date in the series
             last_date = convert_date('%Y-%m-%d', date_str)
-            end_date = datetime.datetime.now().date() - datetime.timedelta(days=2)
-            start = 1
+            end_date = datetime.datetime.now().date() - datetime.timedelta(days=1)
+            start = 0
             end = start + abs((last_date - end_date).days) #fdetermine number of days of data to collect
             print("The last date in the file is " + last_date.strftime("%m/%d/%Y") + " #records to add " + str(end))
 
@@ -128,14 +126,16 @@ for filename in lstfiles:
         dictdata = df_create_append(df_his_data, dictdata, filename)
 
     else:#get the histroy between the start end day range
+            print('files do not exist, writing new files')
             start = 1
-            end = 800
+            end = 400
+            break #exit for loop as it is not needed
 
-#Get all garmin connect health data and export to CSV files
-for i in range(start, end):
-    print ( i )
+#Get  garmin connect healthdata in the selected data range and create/append to CSV files
+for i in range(end, start, -1):
+
     iterdate = today - datetime.timedelta(days=i)
-
+    print(iterdate)
 #Deal with Garmin Json data break Json sleep data down into two dataframes 1) sleep summary 2) sleep interday details and export to CSV
     data = gc.get_sleep_data(client, iterdate.isoformat())
     dictdata = unest(data, dictdata)
@@ -161,7 +161,7 @@ for i in range(start, end):
     dictdata = df_create_append(df,dictdata,'daily_steps')
 
 #this picks up the power curve and the Vo2 max
-data  = gc.get_activities(client,0,5)
+data  = gc.get_activities(client, start, end)
 df = pd.json_normalize(data)
 dictdata = df_create_append(df,dictdata,'activities summaries')
 
