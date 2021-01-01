@@ -2,7 +2,6 @@ from garminconnect import Garmin as GC
 import datetime
 import pandas as pd
 import os
-
 # import csv
 
 
