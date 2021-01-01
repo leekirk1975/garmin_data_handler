@@ -138,7 +138,7 @@ for filename in lstfiles:
     else:  # get the histroy between the start end day range
         print('files do not exist, writing new files')
         start = 1
-        end = 400
+        end = 450
         break  # exit for loop as it is not needed
 
 # Get  garmin connect healthdata in the selected data range and create/append to CSV files
