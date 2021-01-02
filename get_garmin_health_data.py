@@ -10,6 +10,7 @@ email, pwd = open('GamrinDetails.txt').read().strip().split(',')
 
 # set today's date
 today = datetime.date.today()
+cwd = os.getcwd()  # get the current working directory
 
 # create a garmin api session
 client = GC(email, pwd)
@@ -17,12 +18,14 @@ GC.login(client)
 
 
 # Deal with the special case of sleepdata - convert json files to dataframes
-def create_sleep_dataframe(thedata, thedict={}):
-    for i in thedata:
-        if isinstance(thedata[i],
+def create_sleep_dataframe(thedata, thedict=None):
+    if thedict is None:
+        thedict = {}
+    for sleepitem in thedata:
+        if isinstance(thedata[sleepitem],
                       (dict, list)):  # skip any field from the json file that is not data in a list or dictionary
-            dfthedata = convert_json_to_df(thedata[i])  # convert the jason field to a DF
-            dfthedata.name = i
+            dfthedata = convert_json_to_df(thedata[sleepitem])  # convert the jason field to a DF
+            dfthedata.name = sleepitem
             if dfthedata.name not in thedict.keys():
                 # if this is the first data set create a new df name after the data set and add it to a dictonary
                 thedict[dfthedata.name] = dfthedata
@@ -38,36 +41,36 @@ def create_sleep_dataframe(thedata, thedict={}):
 
 
 # handle the unesting of the sleep DF - unquie case.
-def unest(data, dictdata):
-    if not bool(dictdata):
-        dictdata = create_sleep_dataframe(data)
-    elif bool(dictdata):  # if the dict is not empty then pass and append data to the existing dataframes
-        dictdata = create_sleep_dataframe(data, dictdata)
-    return dictdata
+def unest(unest_data, unest_dict_data):
+    if not bool(unest_dict_data):
+        unest_dict_data = create_sleep_dataframe(unest_data)
+    elif bool(unest_dict_data):  # if the dict is not empty then pass and append data to the existing dataframes
+        unest_dict_data = create_sleep_dataframe(unest_data, unest_dict_data)
+    return unest_dict_data
 
 
 # convert json and list to dataframes
 def convert_json_to_df(thedatafield):
     if isinstance(thedatafield, dict):
         # index = 0 to aviod "ValueError: If using all scalar values, you must pass an index"
-        df = pd.DataFrame(thedatafield, index=[
+        df1 = pd.DataFrame(thedatafield, index=[
             0])
         # https://stackoverflow.com/questions/17839973/constructing-pandas-dataframe-from-values-in-variables-gives-valueerror-if-usi
     elif isinstance(thedatafield, list):
-        df = pd.DataFrame(thedatafield)
+        df1 = pd.DataFrame(thedatafield)
     else:
-        df = None
+        df1 = None
         print("type not list or dict")
 
-    return df
+    return df1
 
 
 # write from a dataframe to CSV
-def df_to_csv(data, filename, date_stamp):  # create csv file
-    cwd = os.getcwd()  # get the current working directory
+def df_to_csv(csv_data, filename, date_stamp):  # create csv file
+
     # Save all data files to a sub directory to aviod cultering
     csvname = cwd + '/data/' + filename + ' raw data.csv'  # + '_' + str(date_stamp.strftime('%Y%m%d%H%M%S')) + '.csv'
-    data.to_csv(csvname, index=False)
+    csv_data.to_csv(csvname, index=False)
 
 
 # Iterate over all the key value pairs in dictionary and call the given callback function()
@@ -84,13 +87,13 @@ def filterthedict(dictobj, callback):
 
 
 # Create a new df if it does not exist and thereafter append any new data
-def df_create_append(df, dictdata, name):
-    df.name = name
-    if df.name in dictdata.keys():
-        dictdata[df.name] = dictdata[df.name].append(df)
-    elif df.name not in dictdata.keys():
-        dictdata[df.name] = df
-    return dictdata
+def df_create_append(df2, dict_data_append, name):
+    df2.name = name
+    if df2.name in dict_data_append.keys():
+        dict_data_append[df2.name] = dict_data_append[df2.name].append(df2)
+    elif df2.name not in dict_data_append.keys():
+        dict_data_append[df2.name] = df2
+    return dict_data_append
 
 
 # convert a string to date format
@@ -115,7 +118,6 @@ lstfiles = ['stats_body_comp', 'daily_steps', 'Heart_Rate_details', 'Heart_Rate_
             'activities summaries']
 
 for filename in lstfiles:
-    cwd = os.getcwd()  # get the current working directory
     csv_file_name = cwd + '/data/' + filename + " raw data.csv"
     file_exists = os.path.isfile(csv_file_name)
 

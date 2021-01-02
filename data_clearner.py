@@ -11,8 +11,9 @@ lst_files = ['stats_body_comp', 'daily_steps', 'Heart_Rate_details', 'Heart_Rate
              'activities summaries']
 
 # lst of list of redundant series to drop form each data set
-dict_drop_list = {"stats_body_comp": ['consumedKilocalories', 'wellnessDescription', 'includesWellnessData',
-                                      'privacyProtected', 'lastSyncTimestampGMT', 'userDailySummaryId'],
+dict_drop_list = {"stats_body_comp": ['consumedKilocalories','burnedKilocalories', 'wellnessDescription', 'includesWellnessData',
+                                      'privacyProtected', 'lastSyncTimestampGMT', 'userDailySummaryId','uuid',
+                                      'includesWellnessData','rule.typeId','from','until'],
                   "daily_steps": [],
                   "Heart_Rate_details": [],
                   "Heart_Rate_Summary": [],
