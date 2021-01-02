@@ -37,7 +37,7 @@ def create_sleep_dataframe(thedata, thedict=None):
         else:
             pass
 
-    return (thedict)
+    return thedict
 
 
 # handle the unesting of the sleep DF - unquie case.
@@ -66,11 +66,11 @@ def convert_json_to_df(thedatafield):
 
 
 # write from a dataframe to CSV
-def df_to_csv(csv_data, filename, date_stamp):  # create csv file
+def df_to_csv(csv_df, csv_filename, file_label,date_stamp):  # create csv file
 
     # Save all data files to a sub directory to aviod cultering
-    csvname = cwd + '/data/' + filename + ' raw data.csv'  # + '_' + str(date_stamp.strftime('%Y%m%d%H%M%S')) + '.csv'
-    csv_data.to_csv(csvname, index=False)
+    csvname = cwd + '/data/' + csv_filename + file_label   # + '_' + str(date_stamp.strftime('%Y%m%d%H%M%S')) + '.csv'
+    csv_df.to_csv(csvname, index=False)
 
 
 # Iterate over all the key value pairs in dictionary and call the given callback function()
@@ -103,7 +103,7 @@ def convert_date(format_str, date_str):
 
 # Get data from garmin
 # set-up empty dict top store all the DF
-dictdata = {}
+dict_data = {}
 start = 0
 end = 0
 
@@ -125,8 +125,8 @@ for filename in lstfiles:
         df_his_data = pd.read_csv(csv_file_name)
         # Get the start date once
         if filename == 'stats_body_comp':
-            date_str = df_his_data['calendarDate'].iloc[-1]  # get the last date in the series
-            last_date = convert_date('%Y-%m-%d', date_str)
+            this_date_str = df_his_data['calendarDate'].iloc[-1]  # get the last date in the series
+            last_date = convert_date('%Y-%m-%d', this_date_str)
             end_date = datetime.datetime.now().date() - datetime.timedelta(days=1)
             start = 0
             end = start + abs((last_date - end_date).days)  # fdetermine number of days of data to collect
@@ -134,7 +134,7 @@ for filename in lstfiles:
 
         print("file exists, now loading data from " + csv_file_name)
         # append df to dict
-        dictdata = df_create_append(df_his_data, dictdata, filename)
+        dict_data = df_create_append(df_his_data, dict_data, filename)
 
     else:  # get the histroy between the start end day range
         print('files do not exist, writing new files')
@@ -150,33 +150,33 @@ for i in range(end, start, -1):
     # Deal with Garmin Json data break Json sleep data down into two dataframes
     # 1) sleep summary 2) sleep interday details and export to CSV
     data = GC.get_sleep_data(client, iterdate.isoformat())
-    dictdata = unest(data, dictdata)
+    dict_data = unest(data, dict_data)
     # convert daily HR data to one CSV
     data = GC.get_heart_rates(client, iterdate.isoformat())
     # extract the daily heart rate summary data excluding any list create a  df
     df = pd.DataFrame(filterthedict(data, (dict, list)), index=[0])
     df.name = 'Heart_Rate_Summary'
-    if df.name in dictdata.keys():
-        dictdata[df.name] = dictdata[df.name].append(df)
-    elif df.name not in dictdata.keys():
-        dictdata[df.name] = df
+    if df.name in dict_data.keys():
+        dict_data[df.name] = dict_data[df.name].append(df)
+    elif df.name not in dict_data.keys():
+        dict_data[df.name] = df
     # extract the list with the detail heart rate data merge into one data frame
     df = pd.DataFrame(data['heartRateValues'], columns=['timestamp', 'heatRateValues'])
-    dictdata = df_create_append(df, dictdata, 'Heart_Rate_details')
+    dict_data = df_create_append(df, dict_data, 'Heart_Rate_details')
     # convert daily stats and body compostion to one CSV
     data = GC.get_stats_and_body(client, iterdate.isoformat())
     df = pd.json_normalize(data)
-    dictdata = df_create_append(df, dictdata, 'stats_body_comp')
+    dict_data = df_create_append(df, dict_data, 'stats_body_comp')
     # convert daily step to one CSV
     data = GC.get_steps_data(client, iterdate.isoformat())
     df = pd.json_normalize(data)
-    dictdata = df_create_append(df, dictdata, 'daily_steps')
+    dict_data = df_create_append(df, dict_data, 'daily_steps')
 
 # this picks up the power curve and the Vo2 max
 data = GC.get_activities(client, start, end)
 df = pd.json_normalize(data)
-dictdata = df_create_append(df, dictdata, 'activities summaries')
+dict_data = df_create_append(df, dict_data, 'activities summaries')
 
 # loop through the dict of dataframes write a CSV file for each one
-for k in dictdata.keys():
-    df_to_csv(dictdata[k], k, today)
+for k in dict_data.keys():
+    df_to_csv(dict_data[k], k, ' raw data.csv', today)
