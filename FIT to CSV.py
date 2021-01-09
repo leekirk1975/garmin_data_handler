@@ -1,4 +1,6 @@
 from fitparse import FitFile
+import pandas as pd
+import datetime
 import os
 
 # Getting the current work directory (cwd)
@@ -8,6 +10,7 @@ cwd = os.getcwd()
 #
 #
 #     pass
+
 
 
 for roots, dirs, files in os.walk(cwd):
@@ -28,11 +31,14 @@ fitfile = FitFile(file)
 # Get all data messages that are of type record
 # include:
 # exclude: file_id,'file_creator','unknown','device_settings','user_profile','zones_target'
-fit_record_type = ['event', 'sport','record','hrv']
+fit_record_type = ['record'] #'hrv','event', 'sport']
+
 
 for record_type in fit_record_type:
+    list_workouts = []
     for record in fitfile.get_messages(record_type):
         # Go through all the data entries in this record
+        workout_dict = {}
         for record_data in record:
 
             # Print the records name and value (and units if it has any)
@@ -41,6 +47,14 @@ for record_type in fit_record_type:
                 print(" * %s: %s %s" % (
                     record_data.name, record_data.value, record_data.units,
                 ))
+                workout_dict[record_data.name] = record_data.value
             elif 'unknown' not in record_data.name:
                 print(" * %s: %s" % (record_data.name, record_data.value))
+                workout_dict[record_data.name] = record_data.value
+
+        list_workouts.append(workout_dict)
         print()
+
+    df_workouts = pd.DataFrame(list_workouts)
+
+print(df_workouts)
