@@ -13,6 +13,7 @@ email, pwd = open('GamrinDetails.txt').read().strip().split(',')
 cwd = os.getcwd()
 backup_dir = cwd + '/data/garmin_backup'
 # write all files types to the back-up directory - Json, gpx, tcx and FIT
+print(backup_dir)
 print('writing back-up files')
 gcb.incremental_backup(email, pwd, backup_dir)
 print('finished')

@@ -29,7 +29,7 @@ dict_drop_list = {"stats_body_comp": ['consumedKilocalories', 'wellnessDescripti
                   "sleepMovement": [],
                   "dailySleepDTO": ['autoSleepStartTimestampGMT', 'autoSleepEndTimestampGMT', 'retro',
                                     'sleepQualityTypePK', 'sleepResultTypePK', 'spo2Threshold'],
-                  "activities summaries": ['averageSwimCadenceInStrokesPerMinute', 'maxSwimCadenceInStrokesPerMinute',
+                  "activities summaries": ['parentId','description','comments','averageSwimCadenceInStrokesPerMinute', 'maxSwimCadenceInStrokesPerMinute',
                                            'averageSwolf', 'activeLengths',
                                            'steps', 'conversationUuid', 'conversationPk', 'numberOfActivityLikes',
                                            'numberOfActivityComments',
@@ -50,7 +50,9 @@ dict_drop_list = {"stats_body_comp": ['consumedKilocalories', 'wellnessDescripti
                                            'summarizedDiveInfo.visibilityUnit', 'summarizedDiveInfo.surfaceCondition',
                                            'summarizedDiveInfo.current', 'summarizedDiveInfo.waterType',
                                            'summarizedDiveInfo.waterDensity', 'summarizedDiveInfo.summarizedDiveGases',
-                                           'summarizedDiveInfo.totalSurfaceTime']}
+                                           'summarizedDiveInfo.totalSurfaceTime','activityType.isHidden','pr','privacy.typeId',
+                                           'privacy.typeKey','eventType.sortOrder','activityType.sortOrder','ownerProfileImageUrlMedium',
+                                            'ownerProfileImageUrlLarge','ownerProfileImageUrlSmall','leftBalance','rightBalance']}
 df_dict = {}
 
 for filename in lst_files:
