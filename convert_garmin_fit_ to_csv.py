@@ -6,17 +6,11 @@ import os
 # Getting the current work directory (cwd)
 cwd = os.getcwd()
 
-# class fit_event_handler(object):
-#
-#
-#     pass
-
-
-
-for roots, dirs, files in os.walk(cwd):
-    for file in files:
-        if file.endswith(".fit"):
-            print(os.path.join(roots, file))
+#print all fit files
+# for roots, dirs, files in os.walk(cwd):
+#     for file in files:
+#         if file.endswith(".fit"):
+#             print(os.path.join(roots, file))
 
 # included messages
 # file_id, event, sport, record, HRV, session
@@ -31,7 +25,7 @@ fitfile = FitFile(file)
 # Get all data messages that are of type record
 # include:
 # exclude: file_id,'file_creator','unknown','device_settings','user_profile','zones_target'
-fit_record_type = ['record'] #'hrv','event', 'sport']
+fit_record_type = ['record', 'hrv'] #,'event', 'sport']
 workout_id = file[-14:-4]
 
 for record_type in fit_record_type:
@@ -71,9 +65,9 @@ for record_type in fit_record_type:
         print()
 
     df_workouts = pd.DataFrame(list_workouts)
-
+    dict_data = df_create_append(df, dict_data, 'activities summaries')
 print(df_workouts)
 
 # Save all data files to a sub directory to aviod cultering
-csvname = cwd + '/data/' + workout_id + '.csv'
+csvname = cwd + '/data/' + workout_id + ' ' + record_type + '.csv'
 df_workouts.to_csv(csvname, index=False)
