@@ -78,4 +78,4 @@ for filename in lst_files:
 
 # loop through the dict of dataframes write a CSV file for each one
 for df_item in df_dict.keys():
-    ggh.df_to_csv(df_dict[df_item], df_item, ' clean data.csv', today)
+    ggh.df_to_csv(df_dict[df_item], df_item, ' clean data.csv')

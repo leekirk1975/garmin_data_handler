@@ -66,7 +66,7 @@ def convert_json_to_df(thedatafield):
 
 
 # write from a dataframe to CSV
-def df_to_csv(csv_df, csv_filename, file_label,date_stamp):  # create csv file
+def df_to_csv(csv_df, csv_filename, file_label):  # create csv file
 
     # Save all data files to a sub directory to aviod cultering
     csvname = cwd + '/data/' + csv_filename + file_label   # + '_' + str(date_stamp.strftime('%Y%m%d%H%M%S')) + '.csv'
@@ -179,4 +179,4 @@ dict_data = df_create_append(df, dict_data, 'activities summaries')
 
 # loop through the dict of dataframes write a CSV file for each one
 for k in dict_data.keys():
-    df_to_csv(dict_data[k], k, ' raw data.csv', today)
+    df_to_csv(dict_data[k], k, ' raw data.csv')
