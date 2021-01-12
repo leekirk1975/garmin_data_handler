@@ -10,14 +10,14 @@ import get_garmin_health_data as ggh
 cwd = os.getcwd()  # get the current working directory
 # Note The file name needs to be reformatted from to 2020-12-04T21:22:38+00:00_5913788595.fit'
 directory = cwd + '/data/garmin_backup/'
-filename = directory + '/data/garmin_backup/2020-12-04T21:22:38+00:00_5913788595.fit'
+#filename = directory + '/data/garmin_backup/2020-12-04T21:22:38+00:00_5913788595.fit'
 # '2020-12-04T21:22:38+00:00_5913788595.fit'
 
-file_list = [filename1 for filename1 in os.listdir(directory) if filename1.endswith(".fit") ]
+file_list = [filename for filename in os.listdir(directory) if filename.endswith(".fit") ]
 
-for file in file_list:
-
-    fitfile = FitFile(filename)
+for filename in file_list:
+    thisfile = directory + filename
+    fitfile = FitFile(thisfile)
 
     # Get all data messages that are of type record
     # include:
@@ -25,6 +25,9 @@ for file in file_list:
     fit_record_type = ['record', 'hrv' ,'event'] #, 'sport']
     workout_id = filename[-14:-4]
     dict_df_workouts = {}
+
+#TO DO
+#just loop through this cycling files
 
     for record_type in fit_record_type:
         list_workouts = []
