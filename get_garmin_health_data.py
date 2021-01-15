@@ -2,7 +2,7 @@ from garminconnect import Garmin as GC
 import datetime
 import pandas as pd
 import os
-# import csv
+import utilities as util
 
 
 # get login and password
@@ -65,14 +65,6 @@ def convert_json_to_df(thedatafield):
     return df1
 
 
-# write from a dataframe to CSV
-def df_to_csv(csv_df, csv_filename, file_label):  # create csv file
-
-    # Save all data files to a sub directory to aviod cultering
-    csvname = cwd + '/data/' + csv_filename + file_label   # + '_' + str(date_stamp.strftime('%Y%m%d%H%M%S')) + '.csv'
-    csv_df.to_csv(csvname, index=False)
-
-
 # Iterate over all the key value pairs in dictionary and call the given callback function()
 # on each pair. Items for which callback() returns True, add them to the new dictionary.
 # In the end return the new dictionary.
@@ -86,14 +78,14 @@ def filterthedict(dictobj, callback):
     return newdict
 
 
-# Create a new df if it does not exist and thereafter append any new data
-def df_create_append(df2, dict_data_append, name):
-    df2.name = name
-    if df2.name in dict_data_append.keys():
-        dict_data_append[df2.name] = dict_data_append[df2.name].append(df2)
-    elif df2.name not in dict_data_append.keys():
-        dict_data_append[df2.name] = df2
-    return dict_data_append
+# # Create a new df if it does not exist and thereafter append any new data
+# def df_create_append(df2, dict_data_append, name):
+#     df2.name = name
+#     if df2.name in dict_data_append.keys():
+#         dict_data_append[df2.name] = dict_data_append[df2.name].append(df2)
+#     elif df2.name not in dict_data_append.keys():
+#         dict_data_append[df2.name] = df2
+#     return dict_data_append
 
 
 # convert a string to date format
@@ -162,21 +154,21 @@ for i in range(end, start, -1):
         dict_data[df.name] = df
     # extract the list with the detail heart rate data merge into one data frame
     df = pd.DataFrame(data['heartRateValues'], columns=['timestamp', 'heatRateValues'])
-    dict_data = df_create_append(df, dict_data, 'Heart_Rate_details')
+    dict_data = util.df_create_append(df, dict_data, 'Heart_Rate_details')
     # convert daily stats and body compostion to one CSV
     data = GC.get_stats_and_body(client, iterdate.isoformat())
     df = pd.json_normalize(data)
-    dict_data = df_create_append(df, dict_data, 'stats_body_comp')
+    dict_data = util.df_create_append(df, dict_data, 'stats_body_comp')
     # convert daily step to one CSV
     data = GC.get_steps_data(client, iterdate.isoformat())
     df = pd.json_normalize(data)
-    dict_data = df_create_append(df, dict_data, 'daily_steps')
+    dict_data = util.df_create_append(df, dict_data, 'daily_steps')
 
 # this picks up the power curve and the Vo2 max
 data = GC.get_activities(client, start, end)
 df = pd.json_normalize(data)
-dict_data = df_create_append(df, dict_data, 'activities summaries')
+dict_data = util.df_create_append(df, dict_data, 'activities summaries')
 
 # loop through the dict of dataframes write a CSV file for each one
 for k in dict_data.keys():
-    df_to_csv(dict_data[k], k, ' raw data.csv')
+    util.df_to_csv(cwd, dict_data[k], k, ' raw data.csv')

@@ -1,7 +1,7 @@
 import datetime
 import dateutil
 import pandas as pd
-import get_garmin_health_data as ggh
+import utilities as util
 import os
 
 # set today's date
@@ -78,4 +78,4 @@ for filename in lst_files:
 
 # loop through the dict of dataframes write a CSV file for each one
 for df_item in df_dict.keys():
-    ggh.df_to_csv(df_dict[df_item], df_item, ' clean data.csv')
+    util.df_to_csv(cwd,df_dict[df_item], df_item, ' clean data.csv')
