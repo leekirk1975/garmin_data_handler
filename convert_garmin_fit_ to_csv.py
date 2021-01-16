@@ -1,5 +1,4 @@
-from fitparse import FitFile
-from fitparse import DataMessage
+from fitparse import FitFile, DataMessage, FitParseError
 import pandas as pd
 # import datetime
 import os
@@ -12,7 +11,7 @@ dict_df_workouts = {}
 # Create list of all files with a .fit extension
 cwd = os.getcwd()  # get the current working directory
 directory = cwd + '/data/garmin_backup/test/'
-#directory = cwd + '/data/garmin_backup/'
+# directory = cwd + '/data/garmin_backup/'
 file_list = [filename for filename in os.listdir(directory) if filename.endswith(".fit")]
 
 # process all the fit files in the list
@@ -26,15 +25,18 @@ for filename in file_list:
     # exclude: file_id,'file_creator','unknown','device_settings','user_profile','zones_target','sport'
     fit_record_type = ['record', 'hrv', 'event']  #
 
-    # create fit object
-    try: #handle ny problems with fit files
+    try:  # handle ny problems with fit files
+        # create fit object
         fit_file = FitFile(this_file)
 
-        # get the sport of the current activity from the fit file
-        this_sport = None
-        for sport in fit_file.get_messages('sport'):
-            while sport == None:
-                this_sport = DataMessage.get_value(sport, 'sport')
+        activity_sport = list(fit_file.get_messages('sport'))
+        this_sport = activity_sport[0].get('sport').value
+
+        # # get the sport of the current activity from the fit file
+        # this_sport = None
+        # for sport in fit_file.get_messages('sport'):
+        #     this_sport = DataMessage.get_value(sport, 'sport')
+
 
         # only process fit files with cycling data (indoor or outdoor)
         if this_sport == 'cycling':
@@ -49,7 +51,8 @@ for filename in file_list:
                     for record_data in record:
 
                         if 'unknown' not in record_data.name:  # exclude in field labelled unknown
-                            #print(" * %s: %s" % (record_data.name, record_data.value))  # split power phase start and end records into two fields
+                            # print(" * %s: %s" % (record_data.name, record_data.value))  # split power phase start
+                            # and end records into two fields
                             if isinstance(record_data.value, (list, tuple)) and record_type == 'record':
                                 for item, label in zip(record_data.value, list_labels):
                                     workout_dict[record_data.name + '_' + label] = item
@@ -60,16 +63,18 @@ for filename in file_list:
                     list_workouts.append(workout_dict)
                     # print()
 
+                # add dada to a dataframe for each workout with a name for the recordtype to a dictionary
+                # for conversion to csv
                 df_workouts = pd.DataFrame(list_workouts)
                 df_workouts.name = record_type
                 dict_df_workouts = util.df_create_append(df_workouts, dict_df_workouts, record_type)
-    except Exception:
+    except FitParseError as exception:
         traceback.print_exc()
-        print('There was an error with workout: '+ workout_id )
+        print('There was an error with workout: ' + workout_id)
 print(dict_df_workouts)
 
 # Save all data to csv files
 for df_item in dict_df_workouts.keys():
     util.df_to_csv(cwd + '/data/', dict_df_workouts[df_item], df_item, ' raw data.csv')
 
-print('finished wrting csv files')
+print('finished writing csv files')

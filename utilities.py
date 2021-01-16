@@ -17,3 +17,8 @@ def df_to_csv(directory, csv_df, csv_filename, file_label):  # create csv file
     # Save all data files to a sub directory to aviod cultering
     csvname = directory  + csv_filename + file_label
     csv_df.to_csv(csvname, index=False)
+
+"""Unit conversions"""
+def semicircle_to_degrees(semicircles):
+    """Convert a number in semicricles to degrees"""
+    return semicircles * (180.0 / 2.0 ** 31)
