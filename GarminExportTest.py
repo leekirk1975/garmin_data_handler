@@ -7,7 +7,7 @@ from garminexport import garminclient as gec
 from garminconnect import Garmin as gc
 import datetime
 
-email, pwd  = open('GamrinDetails.txt').read().strip().split(',')#set the client secret and refresh token
+email, pwd  = open('GarminDetails.txt').read().strip().split(',')#set the client secret and refresh token
 
 #set todays date
 today = datetime.date.today()

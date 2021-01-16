@@ -29,13 +29,9 @@ for filename in file_list:
         # create fit object
         fit_file = FitFile(this_file)
 
+        # # get the sport of the current activity from the fit file using the fitparse methods
         activity_sport = list(fit_file.get_messages('sport'))
         this_sport = activity_sport[0].get('sport').value
-
-        # # get the sport of the current activity from the fit file
-        # this_sport = None
-        # for sport in fit_file.get_messages('sport'):
-        #     this_sport = DataMessage.get_value(sport, 'sport')
 
 
         # only process fit files with cycling data (indoor or outdoor)
@@ -69,8 +65,8 @@ for filename in file_list:
                 df_workouts.name = record_type
                 dict_df_workouts = util.df_create_append(df_workouts, dict_df_workouts, record_type)
     except FitParseError as exception:
-        traceback.print_exc()
-        print('There was an error with workout: ' + workout_id)
+        #traceback.print_exc()
+        print('There was an error: '+ exception.args[0] + " with workout: " + workout_id)
 print(dict_df_workouts)
 
 # Save all data to csv files

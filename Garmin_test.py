@@ -4,7 +4,7 @@
 from garminconnect import Garmin as gc
 import datetime
 
-email, pwd  = open('GamrinDetails.txt').read().strip().split(',')#set the client secret and refresh token
+email, pwd  = open('GarminDetails.txt').read().strip().split(',')#set the client secret and refresh token
 
 
 

@@ -6,7 +6,7 @@ import os
 
 # get login and password
 print("logging on")
-email, pwd = open('GamrinDetails.txt').read().strip().split(',')
+email, pwd = open('GarminDetails.txt').read().strip().split(',')
 #######################################################
 # Use Garminexport to export all activity history
 # set the location to store files

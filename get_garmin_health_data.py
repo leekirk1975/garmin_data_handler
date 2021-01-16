@@ -6,7 +6,7 @@ import utilities as util
 
 
 # get login and password
-email, pwd = open('GamrinDetails.txt').read().strip().split(',')
+email, pwd = open('GarminDetails.txt').read().strip().split(',')
 
 # set today's date
 today = datetime.date.today()
@@ -27,7 +27,7 @@ def create_sleep_dataframe(thedata, thedict=None):
             dfthedata = convert_json_to_df(thedata[sleepitem])  # convert the jason field to a DF
             dfthedata.name = sleepitem
             if dfthedata.name not in thedict.keys():
-                # if this is the first data set create a new df name after the data set and add it to a dictonary
+                # if this is the first data set create a new df name after the data set and add it to a dictionary
                 thedict[dfthedata.name] = dfthedata
             elif dfthedata.name in thedict.keys():
                 # append any additional data to the existing dataframe in the dict
@@ -40,7 +40,7 @@ def create_sleep_dataframe(thedata, thedict=None):
     return thedict
 
 
-# handle the unesting of the sleep DF - unquie case.
+# handle the unesting of the sleep DF - unique case.
 def unest(unest_data, unest_dict_data):
     if not bool(unest_dict_data):
         unest_dict_data = create_sleep_dataframe(unest_data)
@@ -68,7 +68,7 @@ def convert_json_to_df(thedatafield):
 # Iterate over all the key value pairs in dictionary and call the given callback function()
 # on each pair. Items for which callback() returns True, add them to the new dictionary.
 # In the end return the new dictionary.
-def filterthedict(dictobj, callback):
+def filterthedict(dictobj):
     newdict = dict()
     # Iterate over all the items in dictionary
     for (key, value) in dictobj.items():
@@ -100,7 +100,7 @@ start = 0
 end = 0
 
 # 1) check if the CSV file exists, if not load all the data.
-# If the file exists then 1) open CSV file, 2) load the CSV file in a panadas data frame
+# If the file exists then 1) open CSV file, 2) load the CSV file in a pandas data frame
 # 3) append anynew data 4) save the updated csv file
 
 # list of the CSV files to dump the garmin query data
@@ -126,9 +126,9 @@ for filename in lstfiles:
 
         print("file exists, now loading data from " + csv_file_name)
         # append df to dict
-        dict_data = df_create_append(df_his_data, dict_data, filename)
+        dict_data = util.df_create_append(df_his_data, dict_data, filename)
 
-    else:  # get the histroy between the start end day range
+    else:  # get the history between the start end day range
         print('files do not exist, writing new files')
         start = 1
         end = 450
@@ -155,7 +155,7 @@ for i in range(end, start, -1):
     # extract the list with the detail heart rate data merge into one data frame
     df = pd.DataFrame(data['heartRateValues'], columns=['timestamp', 'heatRateValues'])
     dict_data = util.df_create_append(df, dict_data, 'Heart_Rate_details')
-    # convert daily stats and body compostion to one CSV
+    # convert daily stats and body composition to one CSV
     data = GC.get_stats_and_body(client, iterdate.isoformat())
     df = pd.json_normalize(data)
     dict_data = util.df_create_append(df, dict_data, 'stats_body_comp')

@@ -13,7 +13,7 @@ lib/
 
 #specific files
 pyvenv.cfg
-/GamrinDetails.txt
+/GarminDetails.txt
 /viz
 /Data dict v 1.0.xlsx
 /~$Data dict v 1.0.xlsx
