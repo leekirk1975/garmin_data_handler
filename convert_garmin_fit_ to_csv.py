@@ -10,8 +10,8 @@ dict_df_workouts = {}
 
 # Create list of all files with a .fit extension
 cwd = os.getcwd()  # get the current working directory
-directory = cwd + '/data/garmin_backup/test/'
-# directory = cwd + '/data/garmin_backup/'
+#directory = cwd + '/data/garmin_backup/test/'
+directory = cwd + '/data/garmin_backup/'
 file_list = [filename for filename in os.listdir(directory) if filename.endswith(".fit")]
 
 # process all the fit files in the list
@@ -66,7 +66,11 @@ for filename in file_list:
                 dict_df_workouts = util.df_create_append(df_workouts, dict_df_workouts, record_type)
     except FitParseError as exception:
         #traceback.print_exc()
+        print('There was a fitparse error: '+ exception.args[0] + " with workout: " + workout_id)
+    except Exception as exception:
+        traceback.print_exc()
         print('There was an error: '+ exception.args[0] + " with workout: " + workout_id)
+
 print(dict_df_workouts)
 
 # Save all data to csv files

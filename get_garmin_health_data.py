@@ -146,7 +146,7 @@ for i in range(end, start, -1):
     # convert daily HR data to one CSV
     data = GC.get_heart_rates(client, iterdate.isoformat())
     # extract the daily heart rate summary data excluding any list create a  df
-    df = pd.DataFrame(filterthedict(data, (dict, list)), index=[0])
+    df = pd.DataFrame(filterthedict(data), index=[0])
     df.name = 'Heart_Rate_Summary'
     if df.name in dict_data.keys():
         dict_data[df.name] = dict_data[df.name].append(df)

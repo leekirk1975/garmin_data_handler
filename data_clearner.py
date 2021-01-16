@@ -1,5 +1,5 @@
 import datetime
-import dateutil
+# import dateutil
 import pandas as pd
 import utilities as util
 import os
@@ -71,7 +71,7 @@ for filename in lst_files:
             [df_raw_data.drop(drop_series, axis=1, inplace=True) for drop_series in dict_drop_list[filename]]
 
         # append all DF to a single dictionary
-        df_dict = ggh.df_create_append(df_raw_data, df_dict, df_raw_data.name)
+        df_dict = util.df_create_append(df_raw_data, df_dict, df_raw_data.name)
 
     else:  # get the history between the start end day range
         print("{} does not exist exiting ".format(filename))
