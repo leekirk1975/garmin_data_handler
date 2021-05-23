@@ -1,3 +1,5 @@
+"""download health data from garmion connect"""
+
 from garminconnect import Garmin as GC
 import datetime
 import pandas as pd
@@ -110,7 +112,8 @@ lstfiles = ['stats_body_comp', 'daily_steps', 'Heart_Rate_details', 'Heart_Rate_
             'activities summaries']
 
 for filename in lstfiles:
-    csv_file_name = cwd + '/data/' + filename + " raw data.csv"
+    csv_file_name = cwd + '/data/Raw health data/' + filename + " raw data.csv"
+    output_dir = cwd + '/data/Raw health data/'
     file_exists = os.path.isfile(csv_file_name)
 
     if file_exists:  # check to see if the files already exist, if they do then check the last data
@@ -131,7 +134,7 @@ for filename in lstfiles:
     else:  # get the history between the start end day range
         print('files do not exist, writing new files')
         start = 1
-        end = 450
+        end = 500
         break  # exit for loop as it is not needed
 
 # Get  garmin connect healthdata in the selected data range and create/append to CSV files
@@ -145,7 +148,7 @@ for i in range(end, start, -1):
     dict_data = unest(data, dict_data)
     # convert daily HR data to one CSV
     data = GC.get_heart_rates(client, iterdate.isoformat())
-    # extract the daily heart rate summary data excluding any list create a  df
+    # extract the daily heart rate summary data (excluding any list) and create a  df
     df = pd.DataFrame(filterthedict(data), index=[0])
     df.name = 'Heart_Rate_Summary'
     if df.name in dict_data.keys():
@@ -171,4 +174,6 @@ dict_data = util.df_create_append(df, dict_data, 'activities summaries')
 
 # loop through the dict of dataframes write a CSV file for each one
 for k in dict_data.keys():
-    util.df_to_csv(cwd, dict_data[k], k, ' raw data.csv')
+    print(f"writing: {cwd} /  {k}  raw data.csv")
+    util.df_to_csv(output_dir, dict_data[k], k, ' raw data.csv')
+

@@ -4,6 +4,9 @@ import pandas as pd
 import utilities as util
 import os
 
+
+'''Clean up garmin health raw data files'''
+
 # set today's date
 today = datetime.date.today()
 cwd = os.getcwd()  # get the current working directory
@@ -56,8 +59,10 @@ dict_drop_list = {"stats_body_comp": ['consumedKilocalories', 'wellnessDescripti
 df_dict = {}
 
 for filename in lst_files:
+    input_dir = cwd + '/data/Raw health data/'
+    output_dir = cwd + '/data/Clean health data/'
+    csv_filename = input_dir+ filename + " raw data.csv"
 
-    csv_filename = cwd + '/data/' + filename + " raw data.csv"
     file_exists = os.path.isfile(csv_filename)
 
     if file_exists:  # check to see if the files already exist, if they do then check the last data
@@ -78,4 +83,4 @@ for filename in lst_files:
 
 # loop through the dict of dataframes write a CSV file for each one
 for df_item in df_dict.keys():
-    util.df_to_csv(cwd,df_dict[df_item], df_item, ' clean data.csv')
+    util.df_to_csv(output_dir,df_dict[df_item], df_item, ' clean data.csv')

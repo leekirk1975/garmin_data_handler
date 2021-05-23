@@ -14,7 +14,7 @@ def df_create_append(df2, dict_data_append, name):
 # write from a dataframe to CSV
 def df_to_csv(directory, csv_df, csv_filename, file_label):  # create csv file
 
-    # Save all data files to a sub directory to aviod cultering
+    # Save all data files to a sub directory to avoid cluttering
     csvname = directory  + csv_filename + file_label
     csv_df.to_csv(csvname, index=False)
 
